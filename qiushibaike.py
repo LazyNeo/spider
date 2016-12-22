@@ -8,6 +8,7 @@ class Spider:
     # 页面初始化
     def __init__(self):
         self.tool = tool.Tool()
+        self.num = 0
     def getPage (self, page):
         url = 'http://www.qiushibaike.com/8hr/page/%s/?s=4940449' %page
         print url
@@ -22,19 +23,26 @@ class Spider:
             for item in items:
                 if item.find("div",{"class":"thumb"}) == None:
                     content = item.find("div",{"class":"content"})
-                    img = item.find("div",{"class":"author"}).img
-                    if img.parent.name == 'a':
-                        print img['src']
-                        self.tool.saveImg(img['src'],img['alt'] + '.jpg')
-                    else :
-                        print img['alt']
-                    print content.get_text()
+                    print content.get_text().encode('GBK', 'ignore')
+            imgs = object_bs.body.find_all("img")
+            for img in imgs:
+                if 'static' not in img['src']:
+                    print img['src'].encode('GBK', 'ignore')
+                    print img['alt'].encode('GBK', 'ignore')
+                    print self.tool.strFilter(img['alt']).encode('GBK', 'ignore')
+                    self.num += 1
+                    print self.num
+                    self.tool.saveImg(img['src'],"img/" + self.tool.strFilter(img['alt']) + '.jpg')
+                else :
+                    print img['src'].encode('GBK', 'ignore')
         except urllib2.URLError,e:
             if hasattr(e,"code"):
                 print e.code
             if hasattr(e,"reason"):
                 print e.reason
-            
+    def test(self):
+        return self.tool.strFilter('神马\\"卡哇伊')
 spider = Spider()
-for i in range(2,50):
+# print spider.test()
+for i in range(1,50):
     spider.getPage(i)

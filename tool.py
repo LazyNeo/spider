@@ -3,6 +3,9 @@ import re
 import os
 import urllib
 import urllib2
+import sys
+reload(sys)
+sys.setdefaultencoding( "utf-8" )
 #处理页面标签类
 class Tool:
     #创建新目录
@@ -25,9 +28,19 @@ class Tool:
             return False
     #传入图片地址，文件名，保存单张图片
     def saveImg(self,imageURL,fileName):
-         u = urllib.urlopen(imageURL)
-         data = u.read()
-         f = open(fileName, 'wb')
-         f.write(data)
-         print u"正在悄悄保存她的一张图片为",fileName
-         f.close()
+        try:
+            u = urllib.urlopen(imageURL)
+            data = u.read()
+            f = open(fileName, 'wb')
+            f.write(data)
+            print u"正在悄悄保存她的一张图片为",fileName.encode('GBK', 'ignore')
+            f.close()
+        except IOError,e:
+            if hasattr(e,"code"):
+                print u"保存图片发生错误code",e.code.encode('GBK', 'ignore')
+            if hasattr(e,"reason"):
+                print u"保存图片发生错误reason",e.reason.encode('GBK', 'ignore')
+
+    def strFilter(self, str):
+        p = re.compile("[\s+\.\!\/\\\_,$%^*(+\"\'<>]+|[+——！！、？…。，，。\]\[？?、~@#￥%灬&*（）]+")
+        return p.sub("",str).decode("utf8", 'ignore')
